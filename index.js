@@ -29,7 +29,7 @@ server.post(zoosUrl, (req, res) => {
         res.status(201).json(ids);
       })
       .catch(err => {
-        res.status(500).json(err);
+        res.status(500).json({ message: 'there was an error adding your zoo' });
       });
   } else {
     res
@@ -148,7 +148,7 @@ server.post(bearsUrl, (req, res) => {
         res.status(201).json(ids);
       })
       .catch(err => {
-        res.status(500).json(err);
+        res.status(500).json({ message: 'there was an error adding your bear' });
       });
   } else {
     res
