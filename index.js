@@ -11,7 +11,10 @@ const knexConfig = require('./knexfile.js');
 
 const db = knex(knexConfig.development);
 
-// endpoints here
+/*
+[POST] requires a req.body with fields:
+  "name": "string"
+*/
 server.post('/api/zoos', (req, res) => {
   db('zoos')
     .insert(req.body)
@@ -23,6 +26,9 @@ server.post('/api/zoos', (req, res) => {
     });
 });
 
+/*
+[GET] requires nothing
+*/
 server.get('/api/zoos', (req, res) => {
   db('zoos')
     .then(zoos => {
@@ -33,6 +39,9 @@ server.get('/api/zoos', (req, res) => {
     });
 });
 
+/*
+[GET] requires an existing id in params
+*/
 server.get('/api/zoos/:id', (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
@@ -44,6 +53,9 @@ server.get('/api/zoos/:id', (req, res) => {
     });
 });
 
+/*
+[DELETE] requires an existing id in params
+*/
 server.delete('/api/zoos/:id', (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
@@ -56,6 +68,10 @@ server.delete('/api/zoos/:id', (req, res) => {
     });
 });
 
+/*
+[PUT] requires an existing id in params and a req.body with fields:
+  "name": "string"
+*/
 server.put('/api/zoos/:id', (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
