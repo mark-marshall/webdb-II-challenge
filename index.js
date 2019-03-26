@@ -8,14 +8,15 @@ server.use(express.json());
 server.use(helmet());
 
 const knexConfig = require('./knexfile.js');
-
 const db = knex(knexConfig.development);
+const zoosUrl = '/api/zoos';
+const zoosUrlById = '/api/zoos/:id';
 
 /*
 [POST] requires a req.body with fields:
   "name": "string"
 */
-server.post('/api/zoos', (req, res) => {
+server.post(zoosUrl, (req, res) => {
   db('zoos')
     .insert(req.body)
     .then(ids => {
@@ -29,7 +30,7 @@ server.post('/api/zoos', (req, res) => {
 /*
 [GET] requires nothing
 */
-server.get('/api/zoos', (req, res) => {
+server.get(zoosUrl, (req, res) => {
   db('zoos')
     .then(zoos => {
       res.status(200).json(zoos);
@@ -42,7 +43,7 @@ server.get('/api/zoos', (req, res) => {
 /*
 [GET] requires an existing id in params
 */
-server.get('/api/zoos/:id', (req, res) => {
+server.get(zoosUrlById, (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
     .then(zoo => {
@@ -56,7 +57,7 @@ server.get('/api/zoos/:id', (req, res) => {
 /*
 [DELETE] requires an existing id in params
 */
-server.delete('/api/zoos/:id', (req, res) => {
+server.delete(zoosUrlById, (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
     .del()
@@ -72,7 +73,7 @@ server.delete('/api/zoos/:id', (req, res) => {
 [PUT] requires an existing id in params and a req.body with fields:
   "name": "string"
 */
-server.put('/api/zoos/:id', (req, res) => {
+server.put(zoosUrlById, (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
     .update(req.body)
