@@ -17,14 +17,21 @@ const zoosUrlById = '/api/zoos/:id';
   "name": "string"
 */
 server.post(zoosUrl, (req, res) => {
-  db('zoos')
-    .insert(req.body)
-    .then(ids => {
-      res.status(201).json(ids);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+  const entry = req.body;
+  if (entry.name) {
+    db('zoos')
+      .insert(entry)
+      .then(ids => {
+        res.status(201).json(ids);
+      })
+      .catch(err => {
+        res.status(500).json(err);
+      });
+  } else {
+    res
+      .status(404)
+      .json({ message: 'please include a name field when creating a new zoo' });
+  }
 });
 
 /*
@@ -36,7 +43,9 @@ server.get(zoosUrl, (req, res) => {
       res.status(200).json(zoos);
     })
     .catch(err => {
-      res.status(500).json(err);
+      res
+        .status(500)
+        .json({ message: 'there was an error retrieving the zoos' });
     });
 });
 
@@ -44,13 +53,23 @@ server.get(zoosUrl, (req, res) => {
 [GET] requires an existing id in params
 */
 server.get(zoosUrlById, (req, res) => {
+  const id = req.params.id;
+
   db('zoos')
-    .where({ id: req.params.id })
+    .where({ id })
     .then(zoo => {
-      res.status(200).json(zoo);
+      if (zoo.length > 0) {
+        res.status(200).json(zoo);
+      } else {
+        res
+          .status(404)
+          .json({ message: 'no zoos exist with the id you provided' });
+      }
     })
     .catch(err => {
-      res.status(500).json(err);
+      res
+        .status(500)
+        .json({ message: 'there was an error retrieving your zoo' });
     });
 });
 
@@ -58,14 +77,22 @@ server.get(zoosUrlById, (req, res) => {
 [DELETE] requires an existing id in params
 */
 server.delete(zoosUrlById, (req, res) => {
+  const id = req.params.id;
+
   db('zoos')
-    .where({ id: req.params.id })
+    .where({ id })
     .del()
     .then(count => {
-      res.status(200).json(count);
+      if (count) {
+        res.status(200).json(count);
+      } else {
+        res
+          .status(404)
+          .json({ message: 'no zoos exist with the id you provided' });
+      }
     })
     .catch(err => {
-      res.status(500).json(err);
+      res.status(500).json({ message: 'there was an error deleting your zoo' });
     });
 });
 
@@ -74,15 +101,30 @@ server.delete(zoosUrlById, (req, res) => {
   "name": "string"
 */
 server.put(zoosUrlById, (req, res) => {
-  db('zoos')
-    .where({ id: req.params.id })
-    .update(req.body)
-    .then(count => {
-      res.status(200).json(count);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+  const entry = req.body;
+  const id = req.params.id;
+
+  if (entry.name) {
+    db('zoos')
+      .where({ id })
+      .update(entry)
+      .then(count => {
+        if (count) {
+          res.status(200).json(count);
+        } else {
+          res
+            .status(404)
+            .json({ message: 'no zoos exist with the id you provided' });
+        }
+      })
+      .catch(err => {
+        res.status(500).json(err);
+      });
+  } else {
+    res
+      .status(404)
+      .json({ message: 'please include a name field when updating a new zoo' });
+  }
 });
 
 const port = 3300;
